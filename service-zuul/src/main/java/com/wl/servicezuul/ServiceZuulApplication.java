@@ -16,3 +16,4 @@ public class ServiceZuulApplication {
         SpringApplication.run(ServiceZuulApplication.class, args);
     }
 }
+//这里的配置，是把 以/api-a/开头的请求都转发给 service-feign服务上

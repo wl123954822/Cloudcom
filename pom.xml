@@ -24,6 +24,8 @@
         <module>serice-feign</module>
         <module>service-tes</module>
         <module>service-zuul</module>
+        <module>config-server</module>
+        <module>admin-server</module>
     </modules>
 
     <properties>

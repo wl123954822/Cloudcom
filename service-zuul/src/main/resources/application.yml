@@ -3,7 +3,7 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:1111/eureka/
 server:
-  port: 3333
+  port: 4444
 spring:
   application:
     name: service-zuul
@@ -12,5 +12,5 @@ zuul:
     api-a:
       path: /api-a/**
       serviceId: service-feign
-##这里的配置，是把 以/api-a/开头的请求都转发给 service-feign服务上
+
 
