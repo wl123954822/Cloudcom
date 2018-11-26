@@ -11,6 +11,6 @@ public interface UserAdminFeign {
     @RequestMapping(value = "/config/user",method = RequestMethod.GET)
     Object getUser();
 
-    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
     Object login();
 }

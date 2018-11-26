@@ -1,3 +1,4 @@
+/*
 package com.wl.servicezuul.config;
 
 import com.netflix.zuul.ZuulFilter;
@@ -26,7 +27,7 @@ public class MyFilter extends ZuulFilter {
     //通过int值来定义过滤器的执行顺序，越小的值越优先处理。
     @Override
     public int filterOrder() {
-        return 0;
+        return 2;
     }
 
     //返回一个boolean类型来判断该过滤器是否要执行，所以通过此函数可实现过滤器的开关。true:总是生效，false:不生效
@@ -46,14 +47,16 @@ public class MyFilter extends ZuulFilter {
         }
     }
 
-    /**
+    */
+/**
      * pre 路由之前
      * routing 路由之时
      * post 路由之后
      * error 发送错误调用
      * @return
      * @throws ZuulException
-     *///过滤器的具体逻辑根据业务自行编写。
+     *//*
+//过滤器的具体逻辑根据业务自行编写。
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -79,3 +82,4 @@ public class MyFilter extends ZuulFilter {
         return null;
     }
 }
+*/
