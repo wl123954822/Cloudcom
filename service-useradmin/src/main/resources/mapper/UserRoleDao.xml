@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wl.serviceuseradmin.dao.UserRoleDao">
+    <resultMap id="BaseResultMap" type="com.wl.serviceuseradmin.entity.UserRole">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="userid" property="userid" jdbcType="INTEGER"/>
+        <result column="rid" property="rid" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <delete id="deleteUserRoleByRid" parameterType="long">
+        DELETE FROM t_user_role WHERE rid=#{rid}
+    </delete>
+
+    <insert id="giveRoles">
+        INSERT INTO t_user_role(userid,rid) set userid = #{userid}, rid = #{rid}
+    </insert>
+
+    <select id="findByUidAdRid" resultMap="BaseResultMap">
+        select * from t_user_role where userid=#{userid} and rid = #{rid}
+    </select>
+
+    <delete id="subtractRoles" >
+        delete from t_user_role where userid=#{userid} and rid = #{rid}
+    </delete>
+</mapper>

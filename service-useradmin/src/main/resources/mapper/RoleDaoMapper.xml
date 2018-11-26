@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wl.serviceuseradmin.dao.RolesDao">
+    <resultMap id="BaseResultMap" type="com.wl.serviceuseradmin.entity.Role">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="nameZh" property="nameZh" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <insert id="addRolesByAdmin">
+        insert into t_role set `name` = #{name},nameZh=#{nameZh}
+    </insert>
+
+    <select id="loadRolesByName" resultMap="BaseResultMap">
+        select * from t_role where  `name` = #{name}
+    </select>
+
+    <delete id="deleteRoles" >
+        delete  from  t_role where id = #{id}
+    </delete>
+
+    <select id="showRolesList" resultMap="BaseResultMap">
+         select * from t_role where id !=#{id}
+    </select>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wl.serviceuseradmin.dao.UserDao">
+    <resultMap id="UserResultMap" type="com.wl.serviceuseradmin.entity.User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="telephone" property="telephone"/>
+        <result column="address" property="address"/>
+        <result column="enabled" property="enabled"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="userface" property="userface"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <resultMap id="lazyLoadRoles" type="com.wl.serviceuseradmin.entity.User" extends="UserResultMap">
+        <collection property="roles" ofType="com.wl.serviceuseradmin.entity.Role" select="com.wl.serviceuseradmin.dao.UserDao.getRolesByUserId"
+                    column="id">
+        </collection>
+    </resultMap>
+    <resultMap id="eagerLoadRoles" type="com.wl.serviceuseradmin.entity.User" extends="UserResultMap">
+        <collection property="roles" ofType="com.wl.serviceuseradmin.entity.Role">
+            <id property="id" column="rid"/>
+            <result property="name" column="rname"/>
+            <result property="nameZh" column="rnameZh"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="loadUserByUserName" resultMap="lazyLoadRoles">
+        select * from t_user where username = #{username};
+    </select>
+
+    <select id="getRolesByUserId" resultType="com.wl.serviceuseradmin.entity.Role">
+        select r.* from t_user_role h,t_role r where h.rid = r.id and h.userid = #{id}
+    </select>
+
+    <insert id="userReg">
+        INSERT INTO t_user set username=#{username},password=#{password}
+    </insert>
+
+    <select id="getAllUser" resultMap="UserResultMap">
+        select * from t_user
+    </select>
+</mapper>

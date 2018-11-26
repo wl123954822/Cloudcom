@@ -22,7 +22,7 @@ public class ServiceTesApplication {
     @Value("${server.port}")
     String port;
 
-    @RequestMapping("/hi")
+    @RequestMapping("/tes")
     public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
         return "hi " + name + " ,i am from port:" + port;
     }
