@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SchedualServiceHiHystric  implements SchedualServiceTes {
     @Override
-    public String tesClientOne(String name) {
-        return name;
+    public String tesClientOne() {
+        return "";
     }
 }

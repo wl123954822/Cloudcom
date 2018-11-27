@@ -1,12 +1,12 @@
 package com.wl.serviceuseradmin.service.impl;
 
 
-import com.wl.serviceuseradmin.common.UserUtiles;
 import com.wl.serviceuseradmin.dao.MenuDao;
 import com.wl.serviceuseradmin.dao.MenuRoleDao;
 import com.wl.serviceuseradmin.entity.Menu;
 import com.wl.serviceuseradmin.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +26,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<Menu> getMenusByUserId() {
-        return menuDao.getMenusByUserId(UserUtiles.getCurrentUser().getId());
+    public List<Menu> getMenusByUserId(Long userId) {
+        return menuDao.getMenusByUserId(userId);
     }
 
     @Override

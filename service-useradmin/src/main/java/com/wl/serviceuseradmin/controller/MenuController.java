@@ -1,8 +1,6 @@
 package com.wl.serviceuseradmin.controller;
 
 import com.alibaba.fastjson.JSONObject;
-
-import com.wl.serviceuseradmin.common.UserUtiles;
 import com.wl.serviceuseradmin.entity.Menu;
 import com.wl.serviceuseradmin.entity.Role;
 import com.wl.serviceuseradmin.entity.User;
@@ -11,6 +9,8 @@ import com.wl.serviceuseradmin.enu.ResultEnum;
 import com.wl.serviceuseradmin.service.MenuService;
 import com.wl.serviceuseradmin.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,10 +27,13 @@ import java.util.List;
 public class MenuController {
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping("/menuByUsers")
-    public List<Menu> menuListByUsers(){
-        return menuService.getMenusByUserId();
+    public List<Menu> menuListByUsers(String token){
+        User user = (User) redisTemplate.opsForValue().get(token);
+        return menuService.getMenusByUserId(user.getId());
     }
 
     /**
@@ -39,8 +42,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/addMenus")
-    public JSONObject addMenus(Menu menu) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject addMenus(Menu menu,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
             for (Role role : roles) {
                 if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -59,8 +62,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/deleteMenus")
-    public JSONObject deleteMenus(Long mid) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject deleteMenus(Long mid,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -80,8 +83,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/giveMenus")
-    public JSONObject giveRoles(Long mId, Long rId) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject giveRoles(Long mId, Long rId,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -101,8 +104,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("subtractMenus")
-    public JSONObject subtractRoles(Long mId, Long rId) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject subtractRoles(Long mId, Long rId,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {

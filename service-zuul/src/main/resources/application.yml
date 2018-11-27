@@ -10,16 +10,11 @@ spring:
 zuul:
   routes:
     api-a:
-      path: /api-a/**
-      serviceId: service-useradmin
+      path: /admin/**
+      serviceId: service-feign
+    api-b:
+      path: /api-b/**
+      serviceId: service-feign
   add-host-header: true
-  sensitive-headers:
+  sensitive-headers: "*"
 
-
-hystrix:
-  command:
-    service-useradmin:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: ...

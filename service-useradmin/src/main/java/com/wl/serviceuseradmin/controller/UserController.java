@@ -1,7 +1,6 @@
 package com.wl.serviceuseradmin.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wl.serviceuseradmin.common.UserUtiles;
 import com.wl.serviceuseradmin.entity.Role;
 import com.wl.serviceuseradmin.entity.User;
 import com.wl.serviceuseradmin.enu.DataEnum;
@@ -9,9 +8,7 @@ import com.wl.serviceuseradmin.enu.ResultEnum;
 import com.wl.serviceuseradmin.service.UserService;
 import com.wl.serviceuseradmin.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,19 +27,22 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 用户登录接口
      */
     @RequestMapping("/login")
-    public JSONObject login(){
-       return Result.result(ResultEnum.NO_LOGIN_ERROR, "error");
+    public JSONObject login(String username, String password,String token){
+       User userDetails =  userService.loadUserByUsername(username);
+       redisTemplate.opsForValue().set(token,userDetails);
+    return Result.result(ResultEnum.SUCCESS,userDetails,"success");
     }
 
     @RequestMapping("/register")
-    public JSONObject register(String username,String password) {
+    public JSONObject register(String username, String password, String token) {
         // 获取当前登录用户
-        User user = UserUtiles.getCurrentUser();
+        User user = (User) redisTemplate.opsForValue().get(token);
         // 获取当前登录用户的权限
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
@@ -56,14 +56,14 @@ public class UserController {
         return null;
     }
 
-    @RequestMapping("/logout")
+   /* @RequestMapping("/logout")
     public JSONObject logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth !=null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         return Result.result(ResultEnum.LOGIN_OUT_SUCCESS, "success");
-    }
+    }*/
 
     @RequestMapping("/allUser")
     public JSONObject allUser () {

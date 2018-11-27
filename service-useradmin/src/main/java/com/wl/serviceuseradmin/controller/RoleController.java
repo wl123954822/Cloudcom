@@ -1,7 +1,6 @@
 package com.wl.serviceuseradmin.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wl.serviceuseradmin.common.UserUtiles;
 import com.wl.serviceuseradmin.entity.Role;
 import com.wl.serviceuseradmin.entity.User;
 import com.wl.serviceuseradmin.enu.DataEnum;
@@ -9,6 +8,7 @@ import com.wl.serviceuseradmin.enu.ResultEnum;
 import com.wl.serviceuseradmin.service.RoleService;
 import com.wl.serviceuseradmin.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,13 +33,15 @@ public class RoleController {
 
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 当前登录用户的角色
      * @return
      */
     @RequestMapping("/roleByCurrentUser")
-    public List<Role> allRolesLis() {
-        User user = UserUtiles.getCurrentUser();
+    public List<Role> allRolesLis(String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> list = user.getRoles();
         return list;
     }
@@ -48,8 +50,8 @@ public class RoleController {
      *创建用户角色
      */
     @RequestMapping("/addRoles")
-    public JSONObject addRoles(HttpServletResponse resp, String name , String nameZh) throws IOException {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject addRoles(String name , String nameZh,String token) throws IOException {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> userRole = user.getRoles();
         for (Role role : userRole) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -65,8 +67,8 @@ public class RoleController {
      * 删除用户角色权限,---将用户关联的权限全部删除
      */
     @RequestMapping("/deleteRoles")
-    public JSONObject deleteRoles(Long rid) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject deleteRoles(Long rid,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -83,8 +85,8 @@ public class RoleController {
      * 显示角色权限列表，为添加角色
      */
     @RequestMapping("/rolesList")
-    public JSONObject showRolesList() {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject showRolesList(String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -101,8 +103,8 @@ public class RoleController {
      * 添加角色权限，管理员为用户赋予角色
      */
     @RequestMapping("/giveRoles")
-    public JSONObject giveRoles(Long userId,Long rId) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject giveRoles(Long userId,Long rId,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {
@@ -119,8 +121,8 @@ public class RoleController {
      * 删除角色权限，管理员为用户解除角色权限
      */
     @RequestMapping("subtractRoles")
-    public JSONObject subtractRoles(Long userId, Long rId) {
-        User user = UserUtiles.getCurrentUser();
+    public JSONObject subtractRoles(Long userId, Long rId,String token) {
+        User user = (User) redisTemplate.opsForValue().get(token);
         List<Role> roles = user.getRoles();
         for (Role role : roles) {
             if (DataEnum.超级管理员.getDesc().equals(role.getName())) {

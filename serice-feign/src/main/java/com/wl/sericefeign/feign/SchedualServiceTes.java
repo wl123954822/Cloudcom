@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface SchedualServiceTes {
 
     @RequestMapping(value = "/tes", method = RequestMethod.GET)
-    String tesClientOne(@RequestParam(value = "name") String name);
+    String tesClientOne();
 }
