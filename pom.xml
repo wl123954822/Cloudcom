@@ -20,13 +20,12 @@
 
     <modules>
         <module>eureka-server</module>
-        <module>eureka-client</module>
         <module>serice-feign</module>
-        <module>service-tes</module>
         <module>service-zuul</module>
         <module>config-server</module>
         <module>admin-server</module>
         <module>service-useradmin</module>
+        <module>service-commodity</module>
     </modules>
 
     <properties>

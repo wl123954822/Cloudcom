@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wl.servicecommodity.dao.CommodityClassificationDao">
+
+    <insert id="insertCommodityClassification" parameterType="com.wl.servicecommodity.entity.CommodityClassification">
+        <selectKey resultType="java.lang.Integer" order="AFTER"
+                   keyProperty="clid">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        INSERT into tb_item_cat(childId,`name`,cstatus) VALUES (
+        #{childId},#{name},#{status}
+        )
+    </insert>
+
+    <update id="deleteCommodityClassification">
+        UPDATE tb_item_cat
+        <set>
+            cstatus=#{status}
+        </set>
+        WHERE clid=#{id}
+    </update>
+
+    <update id="updateCommodityClassification" parameterType="com.wl.servicecommodity.entity.CommodityClassification">
+        UPDATE tb_item_cat
+        <set>
+            <if test="childId != null ">childId = #{childId},</if>
+            <if test="name != null and name.length()>0">`name` = #{name},</if>
+            cstatus=#{status}
+        </set>
+        WHERE clid=#{id}
+    </update>
+
+    <select id="selectAllCommod" resultType="com.wl.servicecommodity.entity.CommodityClassification">
+        SELECT * FROM tb_item_cat
+        <if test="status != 0">
+            where cstatus = #{status}
+        </if>
+    </select>
+
+    <select id="selectByCommonId" resultType="com.wl.servicecommodity.entity.CommodityClassification" parameterType="java.lang.Integer">
+        SELECT * from tb_item_cat WHERE clid=#{commodityId}
+    </select>
+
+
+    <select id="selectByCommonIdList" resultType="com.wl.servicecommodity.entity.CommodityClassification" parameterType="java.util.List">
+        SELECT * FROM tb_item_cat WHERE clid  in
+        <foreach collection="list" index="index" item="item" open="("  separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="status != 0">
+            where cstatus = #{status}
+        </if>
+    </select>
+
+    <select id="selectByCommonName" resultType="com.wl.servicecommodity.entity.CommodityClassification">
+        select * from tb_item_cat where  name = #{name}
+    </select>
+</mapper>

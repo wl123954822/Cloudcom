@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * @author wanglei
+ */
 @RestController
 @RequestMapping("/config")
 public class Tes {

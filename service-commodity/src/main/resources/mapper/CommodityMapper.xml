@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wl.servicecommodity.dao.CommodityDao">
+    <resultMap id="CommodityResultMap" type="com.wl.servicecommodity.entity.Commodity">
+        <id column="id" property="id"/>
+        <result column="cid" property="cid"/>
+        <result column="itemName" property="itemName"/>
+        <result column="itemImage" property="itemImage"/>
+        <result column="itemNum" property="itemNum"/>
+        <result column="purchasePrice" property="purchasePrice"/>
+        <result column="itemPrice" property="itemPrice"/>
+        <result column="createDate" property="createDate"/>
+        <result column="createName" property="createName"/>
+        <result column="itemIntroduce" property="itemIntroduce"/>
+        <result column="itemIntroduceImage" property="itemIntroduceImage"/>
+        <result column="status" property="status"/>
+        <result column="updateTime" property="updateTime"/>
+        <result column="updateName" property="updateName"/>
+        <association property="commodityClassification"  javaType="com.wl.servicecommodity.entity.CommodityClassification">
+            <id property="clid" column="clid"/>
+            <result property="childId" column="childId"/>
+            <result property="name" column="name"/>
+            <result property="cstatus" column="cstatus"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, cid, itemName, itemImage, itemNum, purchasePrice, itemPrice, createDate, createName,
+    itemIntroduce, itemIntroduceImage, status,updateTime,updateName
+    </sql>
+
+    <insert id="insertCommodity" parameterType="com.wl.servicecommodity.entity.Commodity">
+        <selectKey resultType="java.lang.Integer" order="AFTER"
+                   keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        INSERT into tb_item(id, cid, itemName, itemImage, itemNum, purchasePrice, itemPrice, updateName, createName,
+        itemIntroduce, itemIntroduceImage, status,updateTime,createDate) VALUES (
+        #{id}, #{cid}, #{itemName}, #{itemImage}, #{itemNum}, #{purchasePrice}, #{itemPrice},  #{createName},
+        #{itemIntroduce}, #{itemIntroduceImage}, #{status},#{updateName},now(),now()
+        )
+    </insert>
+
+    <update id="deleteCommodity">
+        UPDATE tb_item
+        <set>
+            status=#{status}
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateCommodity" parameterType="com.wl.servicecommodity.entity.Commodity">
+        update tb_item
+        <set>
+            cid = #{cid},
+            itemName =#{itemName},
+            itemImage =#{itemImage},
+            itemNum =#{itemNum},
+            purchasePrice =#{purchasePrice},
+            itemPrice =#{itemPrice},
+            createDate =#{createDate},
+            createName =#{createName},
+            itemIntroduce =#{itemIntroduce},
+            itemIntroduceImage =#{itemIntroduceImage},
+            status =#{status},
+            updateTime = now(),
+            updateName =#{updateName}
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <select id="commodityAll" resultMap="CommodityResultMap">
+        SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
+        i.createName,
+        i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
+        c where
+        i.cid = c.clid
+        <if test="status != 0">
+            where status = #{status}
+        </if>
+        order by createDate
+    </select>
+
+    <select id="commodById" resultMap="CommodityResultMap">
+        SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
+        i.createName,
+        i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
+        c where
+        i.cid = c.clid and id=#{commodityId}
+    </select>
+
+    <select id="commodByCid" resultMap="CommodityResultMap">
+        SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
+        i.createName,
+        i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
+        c where
+        i.cid = c.clid  WHERE clid =#{cid}
+        <if test="status != 0">
+            and  status = #{status}
+        </if>
+        order by createDate
+    </select>
+
+    <select id="commodByName" resultMap="CommodityResultMap">
+        SELECT<include refid="Base_Column_List"/>
+        FROM tb_item   WHERE itemName = #{itemName}
+        <if test="status != 0">
+            and status = #{status}
+        </if>
+    </select>
+</mapper>

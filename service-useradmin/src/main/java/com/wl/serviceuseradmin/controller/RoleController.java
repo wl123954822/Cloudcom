@@ -26,6 +26,7 @@ import java.util.List;
  * 4.显示角色权限列表，为添加角色
  * 5.添加角色权限，管理员为用户赋予角色权限
  * 6.删除角色权限，管理员为用户解除角色权限
+ * @author wanglei
  */
 @RestController
 @RequestMapping("/role")

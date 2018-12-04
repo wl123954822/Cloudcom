@@ -23,6 +23,7 @@ import java.util.List;
  * 1.用户注册 ---不对外开放注册接口，需要管理员分配
  * 2.用户登录 ---登录后台管理
  * 3.用户注销 ---清除当前session
+ * @author wanglei
  */
 @RestController
 public class UserController {
