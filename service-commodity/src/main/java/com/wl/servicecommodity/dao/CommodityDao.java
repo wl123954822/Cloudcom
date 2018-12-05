@@ -2,6 +2,7 @@ package com.wl.servicecommodity.dao;
 
 import com.wl.servicecommodity.entity.Commodity;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,10 @@ import java.util.List;
  * 5.根据id查询
  * 6.根据分类查询
  * 7.根据名称查询
+ *
+ *
+ * 8.增加库存
+ * 9.扣减库存
  */
 public interface CommodityDao {
 
@@ -69,4 +74,27 @@ public interface CommodityDao {
      */
     Commodity commodByName(@Param("itemName") String itemName,@Param("status") int status);
 
+    /**
+     * 8.增加库存
+     * @param itemId
+     * @param addItemNum
+     * @return
+     */
+    @Transactional(rollbackFor = {Exception.class})
+    int addItemNum(@Param("id") int itemId, @Param("addNum") int addItemNum);
+
+    /**
+     *  9.减少库存
+     * @param itemId
+     * @param delItemNum
+     * @return
+     */
+    int delItemNum(@Param("id") int itemId, @Param("delNum") int delItemNum,@Param("oldVersion") int oldVersion);
+
+    /**
+     * 查询当前的库存
+     * @param itemId
+     * @return
+     */
+    long getItemNum (@Param("id") int itemId);
 }

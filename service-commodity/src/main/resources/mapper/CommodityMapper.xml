@@ -16,6 +16,7 @@
         <result column="status" property="status"/>
         <result column="updateTime" property="updateTime"/>
         <result column="updateName" property="updateName"/>
+        <result column="version" property="version"/>
         <association property="commodityClassification"  javaType="com.wl.servicecommodity.entity.CommodityClassification">
             <id property="clid" column="clid"/>
             <result property="childId" column="childId"/>
@@ -26,7 +27,7 @@
 
     <sql id="Base_Column_List">
     id, cid, itemName, itemImage, itemNum, purchasePrice, itemPrice, createDate, createName,
-    itemIntroduce, itemIntroduceImage, status,updateTime,updateName
+    itemIntroduce, itemIntroduceImage, status,version,updateTime,updateName,
     </sql>
 
     <insert id="insertCommodity" parameterType="com.wl.servicecommodity.entity.Commodity">
@@ -37,7 +38,7 @@
         INSERT into tb_item(id, cid, itemName, itemImage, itemNum, purchasePrice, itemPrice, updateName, createName,
         itemIntroduce, itemIntroduceImage, status,updateTime,createDate) VALUES (
         #{id}, #{cid}, #{itemName}, #{itemImage}, #{itemNum}, #{purchasePrice}, #{itemPrice},  #{createName},
-        #{itemIntroduce}, #{itemIntroduceImage}, #{status},#{updateName},now(),now()
+        #{itemIntroduce}, #{itemIntroduceImage}, #{status},#{updateName},#{version},now(),now()
         )
     </insert>
 
@@ -65,13 +66,14 @@
             status =#{status},
             updateTime = now(),
             updateName =#{updateName}
+            version=#{version}
         </set>
         WHERE id=#{id}
     </update>
 
     <select id="commodityAll" resultMap="CommodityResultMap">
         SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
-        i.createName,
+        i.createName,i.version,
         i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
         c where
         i.cid = c.clid
@@ -83,7 +85,7 @@
 
     <select id="commodById" resultMap="CommodityResultMap">
         SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
-        i.createName,
+        i.createName,i.version,
         i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
         c where
         i.cid = c.clid and id=#{commodityId}
@@ -91,7 +93,7 @@
 
     <select id="commodByCid" resultMap="CommodityResultMap">
         SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
-        i.createName,
+        i.createName,i.version,
         i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
         c where
         i.cid = c.clid  WHERE clid =#{cid}
@@ -107,5 +109,25 @@
         <if test="status != 0">
             and status = #{status}
         </if>
+    </select>
+
+    <update id="addItemNum">
+        update tb_item
+        <set>
+            itemNum = #{addNum} + itemNum
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id="delItemNum">
+        update tb_item
+        <set>
+            itemNum =itemNum - #{delNum},version = version +1
+        </set>
+        where id=#{id} and version = #{oldVersion}
+    </update>
+
+    <select id="getItemNum" resultType="java.lang.Long">
+        select  itemNum from tb_item where id=#{id}
     </select>
 </mapper>

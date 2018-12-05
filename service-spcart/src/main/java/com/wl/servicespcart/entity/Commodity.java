@@ -1,4 +1,4 @@
-package com.wl.servicecommodity.entity;
+package com.wl.servicespcart.entity;
 
 import java.math.BigDecimal;
 
@@ -64,7 +64,7 @@ public class Commodity {
 	 */
 	private String updateName;
 	/**
-	 * 减库存版本
+     * 减库存版本
 	 */
 	private int version;
 

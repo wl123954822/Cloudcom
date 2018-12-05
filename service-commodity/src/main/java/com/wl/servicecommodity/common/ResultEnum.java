@@ -13,7 +13,8 @@ public enum ResultEnum {
     PARAM_ISNULL(3,"传参为空"),
     RESULT_REPEAT(4,"结果重复"),
     NO_JURISDICTION(5,"没有权限"),
-    LOGIN_OUT_SUCCESS(6,"退出成功");
+    LOGIN_OUT_SUCCESS(6,"退出成功"),
+    ERROR(7,"失败");
     private Integer code;
 
     private String message;

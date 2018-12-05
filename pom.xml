@@ -26,6 +26,7 @@
         <module>admin-server</module>
         <module>service-useradmin</module>
         <module>service-commodity</module>
+        <module>service-spcart</module>
     </modules>
 
     <properties>
