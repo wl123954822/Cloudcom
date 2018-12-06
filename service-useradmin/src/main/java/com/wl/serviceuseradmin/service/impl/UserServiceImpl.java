@@ -6,6 +6,7 @@ import com.wl.serviceuseradmin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -45,5 +46,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUser() {
         return userDao.getAllUser();
+    }
+
+    @Override
+    public User loadUserByOpenid(String openId) {
+        User user = new User();
+        if (!StringUtils.isEmpty(openId)) {
+            user = this.userDao.getUserByOpenId(openId);
+        }
+        return user;
     }
 }

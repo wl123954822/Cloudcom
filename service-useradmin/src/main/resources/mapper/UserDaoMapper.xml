@@ -14,6 +14,7 @@
         <result column="password" property="password"/>
         <result column="userface" property="userface"/>
         <result column="remark" property="remark"/>
+        <result column="openId" property="openId"/>
     </resultMap>
     <resultMap id="lazyLoadRoles" type="com.wl.serviceuseradmin.entity.User" extends="UserResultMap">
         <collection property="roles" ofType="com.wl.serviceuseradmin.entity.Role" select="com.wl.serviceuseradmin.dao.UserDao.getRolesByUserId"
@@ -43,5 +44,9 @@
 
     <select id="getAllUser" resultMap="UserResultMap">
         select * from t_user
+    </select>
+
+    <select id="getUserByOpenId" resultMap="lazyLoadRoles">
+        select * from t_user where openId = #{openId};
     </select>
 </mapper>

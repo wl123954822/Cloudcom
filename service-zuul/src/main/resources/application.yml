@@ -12,9 +12,9 @@ zuul:
     api-a:
       path: /admin/**
       serviceId: service-feign
-    api-b:
-      path: /api-b/**
-      serviceId: service-feign
+    cart:
+      path: /cart/**
+      serviceId: service-spcart
   add-host-header: true
-  sensitive-headers: "*"
+  sensitive-headers:
 

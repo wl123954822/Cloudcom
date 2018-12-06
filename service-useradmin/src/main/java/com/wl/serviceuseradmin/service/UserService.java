@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface UserService {
 
-    public User loadUserByUsername(String s);
+     User loadUserByUsername(String s);
 
-    public int UserReg(String username, String password);
+     int UserReg(String username, String password);
 
-    public List<User> getAllUser();
+     List<User> getAllUser();
+
+    User loadUserByOpenid(String openId);
 }

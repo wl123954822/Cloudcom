@@ -29,5 +29,5 @@ public interface UserDao {
 
     List<User> getAllUser();
 
-
+    User getUserByOpenId(@Param("openId") String openId);
 }
