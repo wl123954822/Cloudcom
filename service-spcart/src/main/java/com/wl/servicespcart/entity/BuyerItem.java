@@ -3,17 +3,17 @@ package com.wl.servicespcart.entity;
 import java.math.BigDecimal;
 
 /**
- * 购物车
+ * 购物车商品
  */
 public class BuyerItem {
     /**
-     * 用户
+     * 商品id
      */
-    private int userId;
+    private int itemId;
     /**
-     * 是否有货
+     * 商品名称
      */
-    private Boolean isHave = true;
+   private String itemName;
     /**
      * 订购数量
      */
@@ -23,6 +23,19 @@ public class BuyerItem {
      */
     private BigDecimal price ;
 
+    /**
+     * 商品介绍
+     */
+    private String itemIntroduce;
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -31,20 +44,12 @@ public class BuyerItem {
         this.price = price;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public Boolean getHave() {
-        return isHave;
-    }
-
-    public void setHave(Boolean have) {
-        isHave = have;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public Integer getAmount() {
@@ -53,5 +58,25 @@ public class BuyerItem {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public String getItemIntroduce() {
+        return itemIntroduce;
+    }
+
+    public void setItemIntroduce(String itemIntroduce) {
+        this.itemIntroduce = itemIntroduce;
+    }
+
+
+    @Override
+    public String toString() {
+        return "BuyerItem{" +
+                "itemId=" + itemId +
+                ", itemName='" + itemName + '\'' +
+                ", amount=" + amount +
+                ", price=" + price +
+                ", itemIntroduce='" + itemIntroduce + '\'' +
+                '}';
     }
 }
