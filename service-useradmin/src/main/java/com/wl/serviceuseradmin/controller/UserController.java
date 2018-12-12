@@ -7,6 +7,7 @@ import com.wl.serviceuseradmin.enu.DataEnum;
 import com.wl.serviceuseradmin.enu.ResultEnum;
 import com.wl.serviceuseradmin.service.UserService;
 import com.wl.serviceuseradmin.util.CookieUtil;
+import com.wl.serviceuseradmin.util.PasswordUtil;
 import com.wl.serviceuseradmin.vo.CookieConstant;
 import com.wl.serviceuseradmin.vo.RedisConstant;
 import com.wl.serviceuseradmin.vo.Result;
@@ -43,25 +44,16 @@ public class UserController {
      * 用户登录接口
      */
     @RequestMapping("/login")
-    public JSONObject login(String username, String password,String token) {
-        User userDetails = null;
-        // 不需要每次都重新保存redis，若发生异常错误，进行处理
-        try {
-            userDetails = (User) redisTemplate.opsForValue().get(token);
-            logger.info("获取redis用户信息");
-            if (userDetails == null) {
-                logger.info("未取到用户信息");
-                userDetails = userService.loadUserByUsername(username);
-                redisTemplate.opsForValue().set(token, userDetails);
-            }
-        } catch (Exception e) {
-            logger.error("redis获取失败"+e);
-            // 将之前token删除，重新赋值
-            redisTemplate.delete(token);
-            userDetails = userService.loadUserByUsername(username);
-            redisTemplate.opsForValue().set(token, userDetails);
+    public JSONObject login(String username, String password) {
+        User user = userService.loadUserByUsername(username);
+        String passwordStr = user.getPassword();
+        // 获取数据库解密后的密码
+        String dePassword = new String(PasswordUtil.AESDecrypt(PasswordUtil.parseHexStr2Byte(passwordStr), username));
+        if (!dePassword.equals(password)) {
+            return Result.result(ResultEnum.PASSWORD_ERROR, "error");
+        } else {
+            return Result.result(ResultEnum.SUCCESS,user.getOpenId(),"success");
         }
-    return Result.result(ResultEnum.SUCCESS,userDetails,"success");
     }
 
     @RequestMapping("/register")
@@ -124,5 +116,34 @@ public class UserController {
                 return Result.result(ResultEnum.ROLE_ERROR,"error");
             }
         });*/
+    }
+
+    @RequestMapping("/admin")
+    public JSONObject adminLogin(@RequestParam("openid") String openId, HttpServletRequest request, HttpServletResponse response) {
+        // 判断是否已经登录
+        Cookie cookie = CookieUtil.get(request, CookieConstant.OPENID);
+        if (cookie != null && !StringUtils.isEmpty(redisTemplate.opsForValue().get(String.format(RedisConstant.OPENID_TEMPLATE, cookie.getValue())))) {
+            return Result.result(ResultEnum.SUCCESS, "success");
+        }
+        // 1.查询用户
+        User user = this.userService.loadUserByOpenid(openId);
+        if (user == null) {
+            return Result.result(ResultEnum.LOGIN_FAIL, "error");
+        }
+        // 判断角色
+        List<Role> rolesList = user.getRoles();
+        for (Role role : rolesList) {
+            if (!role.getName().equals(DataEnum.超级管理员.getDesc())) {
+                return Result.result(ResultEnum.ROLE_ERROR, "error");
+            }
+        }
+        // 存到redis key=openid,value=openid
+        Integer expire = CookieConstant.expire;
+        redisTemplate.opsForValue().set(String.format(RedisConstant.OPENID_TEMPLATE, openId), openId, expire, TimeUnit.SECONDS);
+
+        //cookie中设置openid
+        CookieUtil.set(response, CookieConstant.OPENID, openId, expire);
+
+        return Result.result(ResultEnum.SUCCESS, user, "success");
     }
 }

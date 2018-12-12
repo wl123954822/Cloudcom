@@ -9,12 +9,12 @@ spring:
     name: service-zuul
 zuul:
   routes:
-    api-a:
+    admin:
       path: /admin/**
-      serviceId: service-feign
+      serviceId: admin-feign
     cart:
-      path: /cart/**
-      serviceId: service-spcart
+      path: /adminlog/**
+      serviceId: service-useradmin
   add-host-header: true
   sensitive-headers:
 

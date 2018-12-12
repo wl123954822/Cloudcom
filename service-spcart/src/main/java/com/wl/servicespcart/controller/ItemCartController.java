@@ -96,12 +96,10 @@ public class ItemCartController {
      * 登录，直接保存在redis中
      * @param userId
      * @param buyerItem
-     * @param response
-     * @param request
      * @return
      */
     @RequestMapping("cartAddIsLogin")
-    public JSONObject cartAddIsLogin(@RequestParam(value = "userId") int userId, BuyerItem buyerItem, HttpServletResponse response, HttpServletRequest request) {
+    public JSONObject cartAddIsLogin(@RequestParam(value = "userId") int userId, BuyerItem buyerItem) {
         // 判断有无添加过购物车
         ItemCart itemCart = (ItemCart) redisTemplate.opsForValue().get(userId + "cart");
         if (itemCart == null) {

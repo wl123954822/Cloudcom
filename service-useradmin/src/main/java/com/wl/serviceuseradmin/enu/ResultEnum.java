@@ -13,7 +13,8 @@ public enum ResultEnum {
     NO_JURISDICTION(5,"没有权限"),
     LOGIN_OUT_SUCCESS(6,"退出成功"),
     LOGIN_FAIL(7,"登录失败"),
-    ROLE_ERROR(8,"角色错误");
+    ROLE_ERROR(8,"角色错误"),
+    PASSWORD_ERROR(9,"密码错误");
     private Integer code;
 
     private String message;
