@@ -27,6 +27,10 @@ public class BuyerItem {
      * 商品介绍
      */
     private String itemIntroduce;
+    /**
+     * 商品分类
+     */
+    private Integer itemClassification;
 
     public int getItemId() {
         return itemId;

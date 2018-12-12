@@ -71,15 +71,19 @@ public class ItemCartController {
         for (BuyerItem buyerItem1 : buyerItemList) {
             if (buyerItem1.getItemId() == buyerItem.getItemId()) {
                 buyerItem1.setAmount(buyerItem.getAmount()+buyerItem1.getAmount());
+                newBuyerItemList.add(buyerItem1);
             } else {
                 newBuyerItemList.add(buyerItem);
             }
         }
+        if ( newBuyerItemList.size() >1 ) {
+           //Optional<BuyerItem> bu = newBuyerItemList.stream().collect(Collectors.maxBy(Comparator.comparing(BuyerItem::getAmount)));
+           // System.out.println(bu.toString());
+           //buyerItemList.addAll();
+        } else {
+            buyerItemList.addAll(newBuyerItemList);
+        }
 
-        System.out.println(newBuyerItemList.toString());
-
-
-        buyerItemList.addAll(newBuyerItemList);
         itemCart.setUpdateDate(simpleDateFormat.format(new Date()));
         String itemCartStr = JsonUtil.toJson(itemCart);
         String rests = URLEncoder.encode(itemCartStr);
@@ -90,7 +94,6 @@ public class ItemCartController {
 
     /**
      * 登录，直接保存在redis中
-     *
      * @param userId
      * @param buyerItem
      * @param response
@@ -113,16 +116,17 @@ public class ItemCartController {
 
         // 第n次添加，或删减
         List<BuyerItem> buyerItemList = itemCart.getBuyerItems();
-        List<BuyerItem> newItemList = new ArrayList<>();
+        LinkedHashSet<BuyerItem> newItemList = new LinkedHashSet<>();
         for (BuyerItem buyerItem1 : buyerItemList) {
             if (buyerItem.getItemId() == buyerItem1.getItemId()) {
                 buyerItem1.setAmount(buyerItem.getAmount() + buyerItem1.getAmount());
-                break;
             } else {
                 newItemList.add(buyerItem);
             }
         }
-        buyerItemList.addAll(newItemList);
+        if (newItemList.size() == 1) {
+            buyerItemList.addAll(newItemList);
+        }
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
         itemCart.setUpdateDate(sd.format(new Date()));
         redisTemplate.opsForValue().set(userId + "cart", itemCart);
@@ -158,7 +162,7 @@ public class ItemCartController {
         String res = URLDecoder.decode(itemCartOld.getValue());
         ItemCart itemCart = (ItemCart) JsonUtil.fromJson(res, ItemCart.class);
         ItemCart itemCartRedis = (ItemCart) redisTemplate.opsForValue().get(userId + "cart");
-        List<BuyerItem> newBuyerList = new ArrayList<>();
+        LinkedHashSet<BuyerItem> newBuyerList = new LinkedHashSet<>();
         // redis中无商品信息
         if (itemCartRedis == null) {
             if (itemCart.getBuyerItems().size() !=0) {
@@ -179,8 +183,13 @@ public class ItemCartController {
                     }
                 }
             }
-            itemCartRedis.getBuyerItems().addAll(newBuyerList);
+            if (newBuyerList.size() == 1) {
+                itemCartRedis.getBuyerItems().addAll(newBuyerList);
+            }
+            // 存入redis中
             redisTemplate.opsForValue().set(userId + "cart", itemCartRedis);
+            // 删除cookie
+            CookieUtil.deleteCookie(itemCartId,request,response);
             return Result.result(ResultEnum.SUCCESS, "success");
         }
 
@@ -210,7 +219,11 @@ public class ItemCartController {
         return Result.nullResult();
     }
 
-
+    /**
+     * 登录情况下 查看购物车
+     * @param userId
+     * @return
+     */
     @RequestMapping("showCartLogin")
     public JSONObject showCartLogin(@RequestParam(value = "userId") int userId) {
         // 从redis获取购物车
@@ -219,5 +232,21 @@ public class ItemCartController {
             return Result.result(ResultEnum.ERROR, "购物车为空", "error");
         }
         return Result.result(ResultEnum.SUCCESS, itemCart.getBuyerItems(), "success");
+    }
+
+    /**
+     * 订单生成 -- 清空购物车
+     * @param userId
+     * @return
+     */
+    @RequestMapping("clearNoneCart")
+    public JSONObject clearNoneCart(@RequestParam(value = "userId") int userId) {
+        // 从redis 获取购物车
+        ItemCart itemCart = (ItemCart) redisTemplate.opsForValue().get(userId+"cart");
+        if (itemCart == null) {
+            return Result.result(ResultEnum.ERROR,"购物车为空","error");
+        }
+        redisTemplate.delete(userId+"cart");
+        return Result.result(ResultEnum.SUCCESS,"删除成功","success");
     }
  }

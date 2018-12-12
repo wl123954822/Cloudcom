@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wl.serviceaddress.dao.AddRessDetailDao">
+    <resultMap id="BaseResultMap" type="com.wl.serviceaddress.entity.AddRessDetail">
+        <id column="id" property="id" />
+        <result column="userName" property="userName"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="county" property="county"/>
+        <result column="addressDetail" property="addressDetail"/>
+        <result column="zipCode" property="zipCode"/>
+        <result column="userPhone" property="userPhone"/>
+        <result column="isDefault" property="isDefault"/>
+        <result column="userId" property="userId"/>
+    </resultMap>
+
+
+    <insert id="insertAddRessDetail" parameterType="com.wl.serviceaddress.entity.AddRessDetail">
+        insert into tb_address(userName,province,city,county,addressDetail,zipCode,userPhone,isDefault,userId) values (
+        #{userName},#{province},#{city},#{county},#{addressDetail},#{zipCode},#{userPhone},#{isDefault} ,#{userId}
+        )
+    </insert>
+
+    <delete id="deleteAddRessDetail" parameterType="java.lang.Integer">
+        delete  from tb_address where  id = #{id}
+    </delete>
+
+    <update id="updateAddRessDetail" parameterType="com.wl.serviceaddress.entity.AddRessDetail">
+        update tb_address
+        <set>
+            <if test="userName !=null" >
+                userName = #{userName},
+            </if>
+            <if test="province !=null">
+                province = #{province},
+            </if>
+            <if test="city">
+                city=#{city},
+            </if>
+            <if test="county != null">
+                county = #{county},
+            </if>
+            <if test="addressDetail != null">
+                addressDetail =#{addressDetail},
+            </if>
+            <if test="zipCode != 0">
+                zipCode = #{zipCode},
+            </if>
+            <if test="userPhone!=null">
+                userPhone = #{userPhone},
+            </if>
+          where id = #{id}
+        </set>
+    </update>
+
+    <select id="listAddressDetail" resultMap="BaseResultMap" >
+        select * from tb_address where userId = #{userId} order by isDefault desc
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select * from tb_address where id = #{id}
+    </select>
+
+    <update id="changeDefault" >
+        update tb_address
+        <set>
+            isDefault = #{isDefault}
+        </set>
+        where id=#{id}
+    </update>
+
+    <select id="selectDefault" resultMap="BaseResultMap">
+        select * from tb_address where isDefault = #{isDefault}
+    </select>
+</mapper>

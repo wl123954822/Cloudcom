@@ -1,5 +1,7 @@
 package com.wl.servicespcart.util;
 
+import org.springframework.util.StringUtils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,5 +47,21 @@ public class CookieUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * 删除cookie
+	 * @param name
+	 * @param request
+	 * @param response
+	 */
+	public static void deleteCookie(String name,HttpServletRequest request,HttpServletResponse response) {
+		Cookie cookie = get(request,name);
+		if (cookie != null) {
+			cookie.setPath("/");
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+			return;
+		}
 	}
 }
