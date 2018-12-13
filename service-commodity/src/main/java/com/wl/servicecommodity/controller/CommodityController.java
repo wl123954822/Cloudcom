@@ -83,7 +83,7 @@ public class CommodityController {
      * @return
      */
     @RequestMapping("/commodityLisByCid")
-    public JSONObject commodityLisByCid(int cid, @RequestParam(value = "status", defaultValue = "0") int status) {
+    public JSONObject commodityLisByCid(@RequestParam(value = "cid", defaultValue = "0") int cid, @RequestParam(value = "status", defaultValue = "0") int status) {
         List<Commodity> commodities = this.commodityService.commodByCid(cid,status);
         return Result.result(ResultEnum.SUCCESS,commodities,"success");
     }

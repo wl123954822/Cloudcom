@@ -29,6 +29,8 @@
         <module>service-commodity</module>
         <module>service-spcart</module>
         <module>service-address</module>
+        <module>service-order</module>
+        <module>common</module>
     </modules>
 
     <properties>

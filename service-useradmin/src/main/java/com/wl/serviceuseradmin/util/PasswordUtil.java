@@ -101,8 +101,9 @@ public class PasswordUtil {
      * 16转二进制
      */
     public static byte[] parseHexStr2Byte(String hexStr) {
-        if (hexStr.length() < 1)
+        if (hexStr.length() < 1) {
             return null;
+        }
         byte[] result = new byte[hexStr.length() / 2];
         for (int i = 0; i < hexStr.length() / 2; i++) {
             int high = Integer.parseInt(hexStr.substring(i * 2, i * 2 + 1), 16);
@@ -135,14 +136,14 @@ public class PasswordUtil {
 
 
     public static void main(String[]args){
-        byte[] jm = PasswordUtil.AESEncrypt("admin","admin");
+        byte[] jm = PasswordUtil.AESEncrypt("test","test");
         System.out.println("加密"+jm);
         // 转16
         String hex = PasswordUtil.parseByte2HexStr(jm);
         System.out.println("加密16进制"+hex);
 
 
-        byte[] jiemi = PasswordUtil.AESDecrypt(PasswordUtil.parseHexStr2Byte(hex),"admin");
+        byte[] jiemi = PasswordUtil.AESDecrypt(PasswordUtil.parseHexStr2Byte(hex),"test");
         System.out.println("解密" + jiemi);
         System.out.println("??"+new String(jiemi));
     }

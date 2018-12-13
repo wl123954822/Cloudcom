@@ -43,8 +43,8 @@ public class UserController {
     /**
      * 用户登录接口
      */
-    @RequestMapping("/login")
-    public JSONObject login(String username, String password) {
+    @RequestMapping("/adminlogin")
+    public JSONObject login(@RequestParam("username") String username, @RequestParam("password") String password,HttpServletRequest request,HttpServletResponse response) {
         User user = userService.loadUserByUsername(username);
         String passwordStr = user.getPassword();
         // 获取数据库解密后的密码
@@ -52,7 +52,7 @@ public class UserController {
         if (!dePassword.equals(password)) {
             return Result.result(ResultEnum.PASSWORD_ERROR, "error");
         } else {
-            return Result.result(ResultEnum.SUCCESS,user.getOpenId(),"success");
+            return this.adminLogin(user.getOpenId(),request,response);
         }
     }
 
@@ -118,8 +118,8 @@ public class UserController {
         });*/
     }
 
-    @RequestMapping("/admin")
-    public JSONObject adminLogin(@RequestParam("openid") String openId, HttpServletRequest request, HttpServletResponse response) {
+
+    public JSONObject adminLogin( String openId, HttpServletRequest request, HttpServletResponse response) {
         // 判断是否已经登录
         Cookie cookie = CookieUtil.get(request, CookieConstant.OPENID);
         if (cookie != null && !StringUtils.isEmpty(redisTemplate.opsForValue().get(String.format(RedisConstant.OPENID_TEMPLATE, cookie.getValue())))) {

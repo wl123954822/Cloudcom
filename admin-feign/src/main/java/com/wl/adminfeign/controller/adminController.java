@@ -1,36 +1,58 @@
 package com.wl.adminfeign.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.regexp.internal.RE;
+import com.wl.adminfeign.feign.CommodityFeign;
 import com.wl.adminfeign.feign.UserAdminFeign;
+import com.wl.entityvo.CommodityClassification;
+import com.wl.entityvo.Menu;
+import com.wl.entityvo.Result;
+import com.wl.entityvo.ResultEnum;
+import com.wl.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 public class adminController {
 
     @Autowired
     private UserAdminFeign userAdminFeign;
-
-    @PostMapping(value = "/login")
-    public JSONObject login(@RequestParam("username") String username, @RequestParam("password") String password) {
-
-        JSONObject userJson = userAdminFeign.login(username,password);
-        System.out.println(userJson);
-        JSONObject openIdJson = userJson.getJSONObject("result");
-        String openId = openIdJson.getString("data");
-        System.out.println(openId);
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
-        JSONObject adminJson = userAdminFeign.admin(openId,request,response);
-        return adminJson;
+    @Autowired
+    private CommodityFeign commodityFeign;
+    @PostMapping(value = "/menulist")
+    public JSONObject login(HttpServletResponse response, HttpServletRequest request)  {
+            Cookie cookie = CookieUtil.get(request, "openid");
+            JSONObject menuList = userAdminFeign.menuList(cookie.getValue());
+            return Result.result(ResultEnum.SUCCESS,menuList,"success");
     }
+
+    @PostMapping(value = "/commodityList")
+    public JSONObject commodityList(@RequestParam(value = "cid", defaultValue = "0") int cid, @RequestParam(value = "status", defaultValue = "0") int status) {
+        return commodityFeign.commodityLisByCid(cid,status);
+    }
+
+    @PostMapping(value = "/commodityClassificationList")
+    public JSONObject commodityClassificationList(@RequestParam(value = "status", defaultValue = "0") int status) {
+        return commodityFeign.selectAllCommondity(status);
+    }
+
+    @PostMapping(value = "/addCommodityClassification")
+    public JSONObject addCommodityClassification(CommodityClassification commodityClassification) {
+        return commodityFeign.addCommondity(commodityClassification);
+    }
+
+   @PostMapping(value = "/deleteCommodityClassification")
+   public JSONObject deleteCommodityClassification(@RequestParam("commodityId") int commodityId) {
+        return commodityFeign.deleteCommondity(commodityId);
+   }
+
+   @PostMapping(value = "/updateCommodityClassification")
+    public JSONObject updateCommodityClassification(CommodityClassification commodityClassification) {
+        return commodityFeign.updateCommondity(commodityClassification);
+   }
 }

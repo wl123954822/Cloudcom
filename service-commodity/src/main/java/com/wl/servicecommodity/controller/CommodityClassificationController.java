@@ -34,8 +34,8 @@ public class CommodityClassificationController {
     }
 
     @RequestMapping("/deleCommondity")
-    public JSONObject deleCommondity(int commodityId,int status) {
-        if (commodityClassificationService.deleteCommodityClassification(commodityId,status)) {
+    public JSONObject deleCommondity(int commodityId) {
+        if (commodityClassificationService.deleteCommodityClassification(commodityId)) {
             return Result.result(ResultEnum.SUCCESS,"success");
         } else {
             return Result.result(ResultEnum.RESULT_REPEAT, "error");

@@ -62,10 +62,7 @@ public class CommodityServiceImpl implements CommodityService {
 
     @Override
     public List<Commodity> commodByCid(int cid, int status) {
-        List<Commodity> list = new ArrayList<>();
-        if (cid != 0) {
-            list = this.commodityDao.commodByCid(cid,status);
-        }
+        List<Commodity>  list = this.commodityDao.commodByCid(cid,status);
         return list;
     }
 }

@@ -26,8 +26,8 @@ public class CommodityClassificationServiceImpl implements CommodityClassificati
     }
 
     @Override
-    public Boolean deleteCommodityClassification(Integer commodityId, Integer status) {
-        if (commodityId != null && status != null) {
+    public Boolean deleteCommodityClassification(Integer commodityId) {
+        if (commodityId != null ) {
                 this.commodityClassificationDao.deleteCommodityClassification(commodityId,3);
                 return true;
         }

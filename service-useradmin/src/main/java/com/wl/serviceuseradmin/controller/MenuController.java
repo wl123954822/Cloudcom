@@ -7,11 +7,13 @@ import com.wl.serviceuseradmin.entity.User;
 import com.wl.serviceuseradmin.enu.DataEnum;
 import com.wl.serviceuseradmin.enu.ResultEnum;
 import com.wl.serviceuseradmin.service.MenuService;
+import com.wl.serviceuseradmin.service.UserService;
 import com.wl.serviceuseradmin.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,11 +31,16 @@ public class MenuController {
     private MenuService menuService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping("/menuByUsers")
-    public List<Menu> menuListByUsers(String token){
-        User user = (User) redisTemplate.opsForValue().get(token);
-        return menuService.getMenusByUserId(user.getId());
+    public JSONObject menuListByUsers(@RequestParam("openid") String openid){
+        User user = userService.loadUserByOpenid(openid);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user",user);
+        jsonObject.put("menu", menuService.getMenusByUserId(user.getId()));
+        return jsonObject;
     }
 
     /**

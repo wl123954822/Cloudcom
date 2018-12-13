@@ -7,14 +7,28 @@ server:
 spring:
   application:
     name: service-zuul
+  redis:
+    database: 0
+    host: 106.12.204.68
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+    timeout: 10000
 zuul:
   routes:
     admin:
-      path: /admin/**
+      path: /qa/**
       serviceId: admin-feign
     cart:
-      path: /adminlog/**
+      path: /adminlogin/**
       serviceId: service-useradmin
   add-host-header: true
   sensitive-headers:
-
+  ribbon:
+    eager-load:
+      enabled: true

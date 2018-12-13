@@ -17,7 +17,7 @@ public interface CommodityClassificationService {
     /**
      * 2.分类删除--假删除
      */
-    Boolean deleteCommodityClassification(@Param("id") Integer commodityId, @Param("status") Integer status);
+    Boolean deleteCommodityClassification(@Param("id") Integer commodityId);
 
     /**
      * 3.分类修改
