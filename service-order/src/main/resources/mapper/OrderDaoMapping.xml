@@ -2,14 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.wl.serviceorder.dao.OrderDao">
 
-    <select id="getList"  resultType="com.wl.serviceorder.dto.OrderAlDto">
-       select toa.orderAId,toa.orderId,toa.orderNumber,toa.areaId,toa.payment,toa.content,toa.createDate,toa.status,
-        too.userId,too.postage,
-        ts.statusName
-       FROM tb_order_al toa
-       INNER JOIN tb_order too ON too.orderId=toa.orderId
-       INNER JOIN tb_status ts ON ts.statusId=toa.status
-
+    <select id="getList"  resultType="com.wl.serviceorder.entity.OrderAl">
+       select toa.orderAId,toa.orderNumber,toa.areaId,toa.payment,toa.content,toa.createDate,toa.status,
+        toa.userId
+        from tb_order_al
+        <if test="status != 0" >
+            where status = #{staus}
+        </if>
     </select>
 
     <select id="getItemList" resultType="com.wl.serviceorder.dto.OrderDetilDto">
@@ -39,25 +38,7 @@
         DATE_SUB(CURDATE(), INTERVAL 1 MONTH)  &lt;= date(createDate) AND status != 1 AND status != 5;
     </select>
 
-    <select id="getOldOrder" resultType="com.wl.serviceorder.dto.OrderAlDto">
-        select toa.orderAId,toa.orderId,toa.orderNumber,toa.areaId,toa.payment,toa.content,toa.createDate,toa.status,
-        too.userId,too.postage,
-        ts.statusName
-       FROM tb_order_al toa
-       INNER JOIN tb_order too ON too.orderId=toa.orderId
-       INNER JOIN tb_status ts ON ts.statusId=toa.status
-       WHERE toa.status ='4'  or  toa.status='5'
-    </select>
 
-    <select id="getNewOrder" resultType="com.wl.serviceorder.dto.OrderAlDto">
-         select toa.orderAId,toa.orderId,toa.orderNumber,toa.areaId,toa.payment,toa.content,toa.createDate,toa.status,
-        too.userId,too.postage,
-        ts.statusName
-       FROM tb_order_al toa
-       INNER JOIN tb_order too ON too.orderId=toa.orderId
-       INNER JOIN tb_status ts ON ts.statusId=toa.status
-       WHERE toa.status ='2'  or  toa.status='3'
-    </select>
 
     <update id="deLiver">
         UPDATE tb_order_al

@@ -1,5 +1,6 @@
 package com.wl.adminfeign.feign;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wl.entityvo.CommodityClassification;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -19,6 +20,8 @@ public interface CommodityFeign {
     @RequestMapping(value = "/commodity/commodityLisByCid", method = RequestMethod.POST)
     JSONObject commodityLisByCid(@RequestParam("cid") int cid, @RequestParam("status") int status);
 
+    @RequestMapping(value = "/commodity/commodityById",method = RequestMethod.POST)
+    JSONObject commodityById(@RequestParam("id") int id);
     /**
      * 显示全部商品分类
      */

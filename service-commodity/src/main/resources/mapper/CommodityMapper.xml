@@ -53,20 +53,38 @@
     <update id="updateCommodity" parameterType="com.wl.servicecommodity.entity.Commodity">
         update tb_item
         <set>
-            cid = #{cid},
-            itemName =#{itemName},
-            itemImage =#{itemImage},
-            itemNum =#{itemNum},
-            purchasePrice =#{purchasePrice},
-            itemPrice =#{itemPrice},
-            createDate =#{createDate},
-            createName =#{createName},
-            itemIntroduce =#{itemIntroduce},
-            itemIntroduceImage =#{itemIntroduceImage},
-            status =#{status},
+            <if test="cid!=0">
+                cid = #{cid},
+            </if>
+            <if test="itemName != null">
+                itemName =#{itemName},
+            </if>
+            <if test="itemImage != null">
+                itemImage =#{itemImage},
+            </if>
+            <if test="itemNum !=0">
+                itemNum =#{itemNum},
+            </if>
+            <if test="purchasePrice != null">
+                purchasePrice =#{purchasePrice},
+            </if>
+            <if test="itemPrice !=null">
+                itemPrice =#{itemPrice},
+            </if>
+            <if test="itemIntroduce != null">
+                itemIntroduce =#{itemIntroduce},
+            </if>
+            <if test="itemIntroduceImage != null">
+                itemIntroduceImage =#{itemIntroduceImage},
+            </if>
+            <if test="status != 0">
+                status =#{status},
+            </if>
             updateTime = now(),
             updateName =#{updateName}
-            version=#{version}
+            <if test="version != 0">
+                version=#{version}
+            </if>
         </set>
         WHERE id=#{id}
     </update>
@@ -95,10 +113,10 @@
         SELECT i.id, i.cid, i.itemName, i.itemImage, i.itemNum, i.purchasePrice, i.itemPrice, i.createDate,
         i.createName,i.version,
         i.itemIntroduce, i.itemIntroduceImage, i.status,i.updateTime,i.updateName ,c.name FROM tb_item i ,tb_item_cat
-        c
+        c where
+        i.cid = c.clid
         <if test="cid !=0">
-            where
-            i.cid = c.clid and clid =#{cid},
+           and clid =#{cid},
         </if>
 
         <if test="status != 0">

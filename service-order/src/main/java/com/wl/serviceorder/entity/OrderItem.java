@@ -8,16 +8,6 @@ public class OrderItem {
 	 
 	private int cartId;
 
-	private int itemId;
-
-	public int getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(int itemId) {
-		this.itemId = itemId;
-	}
-
 	public int getOrderItemId() {
 		return orderItemId;
 	}

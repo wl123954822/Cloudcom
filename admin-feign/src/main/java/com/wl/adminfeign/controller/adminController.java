@@ -1,21 +1,17 @@
 package com.wl.adminfeign.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.regexp.internal.RE;
 import com.wl.adminfeign.feign.CommodityFeign;
 import com.wl.adminfeign.feign.UserAdminFeign;
 import com.wl.entityvo.CommodityClassification;
-import com.wl.entityvo.Menu;
 import com.wl.entityvo.Result;
 import com.wl.entityvo.ResultEnum;
 import com.wl.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @RestController
 public class adminController {
@@ -34,6 +30,11 @@ public class adminController {
     @PostMapping(value = "/commodityList")
     public JSONObject commodityList(@RequestParam(value = "cid", defaultValue = "0") int cid, @RequestParam(value = "status", defaultValue = "0") int status) {
         return commodityFeign.commodityLisByCid(cid,status);
+    }
+
+    @PostMapping(value = "/commodById")
+    public JSONObject commodById(@RequestParam(value = "id") int id) {
+        return commodityFeign.commodityById(id);
     }
 
     @PostMapping(value = "/commodityClassificationList")

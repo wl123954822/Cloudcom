@@ -33,18 +33,15 @@ public class OrderController {
 
     //所有的订单列表
     @RequestMapping("/list")
-    public Map<String,Object> getList(int pageSize, int pageNumber) {
-
+    public Map<String,Object> getList(@RequestParam("pagsSize") int pageSize, @RequestParam("pageNumber") int pageNumber, @RequestParam(value = "status",defaultValue = "0") int status) {
         Map<String,Object> map = new HashMap<>();
         PageHelper.startPage(pageNumber,pageSize);
         List<OrderAlDto> list = orderAlService.getList();
         PageInfo<OrderAlDto> info = new PageInfo<>(list);
         for (OrderAlDto orderAlDto:list){
             String time = orderAlDto.getCreateDate();
-
             info.setOrderBy(time);
         }
-
         map.put("rows",info.getList());
         map.put("total",info.getTotal());
         return map;
@@ -53,32 +50,10 @@ public class OrderController {
 
     //订单详情页
     @RequestMapping("/orderAlLis")
-    public Map<String, Object> getAll(@RequestParam("orderId") int orderId,
-                                      @RequestParam("userId") int userId,
-                                      @RequestParam("areaId") int areaId,
-                                      @RequestParam("statusName") String statusName) {
+    public Map<String, Object> getAll(@RequestParam("orderId") int orderId) {
         Map<String, Object> map = new HashMap<>();
-
         //商品
         List<OrderDetilDto> orderDetilDtos = orderAlService.getItemList(orderId);
-
-        //人名
-        String nickName = orderAlService.getNickName(userId);
-        //地点
-       /* List<Address> addresses = orderAlService.getAddress(areaId);
-        for (OrderDetilDto orderDetilDto : orderDetilDtos) {
-            orderDetilDto.setNickName(nickName);
-            orderDetilDto.setStatusName(statusName);
-            for (Address address : addresses) {
-                orderDetilDto.setConsignee(address.getConsignee());
-                orderDetilDto.setTelephone(address.getTelephone());
-                orderDetilDto.setProvince(address.getProvince());
-                orderDetilDto.setCity(address.getCity());
-                orderDetilDto.setArea(address.getArea());
-                orderDetilDto.setDetailArea(address.getDetailArea());
-            }
-        }*/
-
         map.put("list", orderDetilDtos);
         return map;
     }

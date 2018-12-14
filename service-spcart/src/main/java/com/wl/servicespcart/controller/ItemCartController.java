@@ -5,9 +5,11 @@ import com.wl.servicespcart.common.Result;
 import com.wl.servicespcart.common.ResultEnum;
 import com.wl.servicespcart.entity.BuyerItem;
 import com.wl.servicespcart.entity.ItemCart;
+import com.wl.servicespcart.service.ItemCartService;
 import com.wl.servicespcart.util.CookieUtil;
 import com.wl.servicespcart.util.JsonUtil;
 import com.wl.servicespcart.vo.CookieConstant;
+import com.wl.servicespcart.vo.ItemCartVo;
 import org.omg.CORBA.PUBLIC_MEMBER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,8 @@ import static com.wl.servicespcart.vo.CookieConstant.expire;
 /**
  * @author wanglei
  * 购物车 controller
- * 1.未登录情况下的购物车，存在cookie中。
- * 2.登录情况下的购物车，存redis中
+ * 1.未登录情况下的购物车，只存redis中。
+ * 2.登录情况下的购物车，存redis中，并且入库
  */
 @RequestMapping("/itemCart")
 @RestController
@@ -41,12 +43,14 @@ public class ItemCartController {
     private static final Logger logger = LoggerFactory.getLogger(ItemCartController.class);
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private ItemCartService itemCartService;
 
     @RequestMapping("/cartAddNoLogin")
     public JSONObject addCart(@RequestParam(value = "itemCart", defaultValue = "null") String itemCartId, BuyerItem buyerItem, HttpServletResponse response, HttpServletRequest request) {
        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         // 1.未登录且未添加过购物车
-        if (itemCartId.equals("null")) {
+        if ("null".equals(itemCartId)) {
             //设置 购物车 的id-唯一
             String cartId = UUID.randomUUID().toString();
             Integer expire = CookieConstant.expire;
@@ -54,17 +58,15 @@ public class ItemCartController {
             buyerItems.add(buyerItem);
             ItemCart itemCart = new ItemCart(cartId,buyerItems,0,1);
             String itemCartStr = JsonUtil.toJson(itemCart);
-            String res = URLEncoder.encode(itemCartStr);
-            CookieUtil.set(response, cartId, res, expire);
+            redisTemplate.opsForValue().set(cartId,itemCartStr);
             logger.info("首次未登录下存购物车信息");
             return Result.result(ResultEnum.SUCCESS, cartId, "success");
         }
 
         // 2.未登录但是已经添加过购物车
         // 再次添加需要前端 判断 是否添加过，并且将cartId传入
-        Cookie itemCartOld = CookieUtil.get(request, itemCartId);
-        String res = URLDecoder.decode(itemCartOld.getValue());
-        ItemCart itemCart = (ItemCart) JsonUtil.fromJson(res, ItemCart.class);
+        String itemCartStrOld = (String) redisTemplate.opsForValue().get(itemCartId);
+        ItemCart itemCart = (ItemCart) JsonUtil.fromJson(itemCartStrOld, ItemCart.class);
         // 存放最终的商品
         LinkedHashSet<BuyerItem> newBuyerItemList = new LinkedHashSet<>();
         List<BuyerItem> buyerItemList = itemCart.getBuyerItems();
@@ -86,10 +88,9 @@ public class ItemCartController {
 
         itemCart.setUpdateDate(simpleDateFormat.format(new Date()));
         String itemCartStr = JsonUtil.toJson(itemCart);
-        String rests = URLEncoder.encode(itemCartStr);
-        // 将结果重新存入cookie
-        CookieUtil.set(response, itemCart.getItemCartId(), rests, expire);
-        return Result.result(ResultEnum.SUCCESS, rests, "success");
+        // 将结果重新存入redis
+        redisTemplate.opsForValue().set(itemCart.getItemCartId(),itemCartStr);
+        return Result.result(ResultEnum.SUCCESS, itemCart.getItemCartId(), "success");
     }
 
     /**
@@ -106,9 +107,13 @@ public class ItemCartController {
             String cartId = UUID.randomUUID().toString();
             List<BuyerItem> buyerItems = new ArrayList<>();
             buyerItems.add(buyerItem);
-            ItemCart newItemCart = new ItemCart(cartId, buyerItems,userId,1);
+            ItemCart newItemCart = new ItemCart(cartId, buyerItems,userId,0);
             // 将 结果直接存到redis中
             redisTemplate.opsForValue().set(userId + "cart", newItemCart);
+            // 将结果写入库中
+            String newbuyerItemsJson = JsonUtil.toJson(buyerItems);
+            ItemCartVo itemCartVo = new ItemCartVo(cartId,userId,0, newbuyerItemsJson);
+            this.itemCartService.addCartService(itemCartVo);
             return Result.result(ResultEnum.SUCCESS, cartId, "success");
         }
 
@@ -128,6 +133,9 @@ public class ItemCartController {
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
         itemCart.setUpdateDate(sd.format(new Date()));
         redisTemplate.opsForValue().set(userId + "cart", itemCart);
+        String newbuyerItemsJson = JsonUtil.toJson(buyerItemList);
+        ItemCartVo itemCartVoip = new ItemCartVo(itemCart.getItemCartId(),itemCart.getUserId(),0,newbuyerItemsJson);
+        this.itemCartService.updateCartService(itemCartVoip);
         return Result.result(ResultEnum.SUCCESS, itemCart.getItemCartId(), "success");
     }
 
@@ -139,26 +147,10 @@ public class ItemCartController {
     public JSONObject noLoginToLogin(@RequestParam(value = "itemCart", defaultValue = "null") String itemCartId,@RequestParam(value = "userId") int userId,
                                      HttpServletResponse response,HttpServletRequest request) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        // cookie无，redis无
-        // 先从cookie中获取 购物车
-        Cookie itemCartOld = CookieUtil.get(request, itemCartId);
-        if (itemCartOld == null) {
-            // 查询是否有redis的购物车
-            logger.info("查询redis 获取" + userId + "购物车信息");
-            ItemCart itemCartRedis = (ItemCart) redisTemplate.opsForValue().get(userId + "cart");
-            // todo,这种情况是不会出现的
-            if (itemCartRedis == null) {
-                // 无cookie购物车信息-直接创建redis
-                String cartId = UUID.randomUUID().toString();
-                List<BuyerItem> buyerItems = new ArrayList<>();
-                ItemCart newItemCart = new ItemCart(cartId, buyerItems, userId, 1);
-                // 将 结果直接存到redis中
-                redisTemplate.opsForValue().set(userId + "cart", newItemCart);
-                return Result.result(ResultEnum.SUCCESS, "success");
-            }
-        }
-        String res = URLDecoder.decode(itemCartOld.getValue());
-        ItemCart itemCart = (ItemCart) JsonUtil.fromJson(res, ItemCart.class);
+        // 从redis获取
+        String itemCartOld = (String) this.redisTemplate.opsForValue().get(itemCartId);
+        ItemCart itemCart = (ItemCart) JsonUtil.fromJson(itemCartOld, ItemCart.class);
+
         ItemCart itemCartRedis = (ItemCart) redisTemplate.opsForValue().get(userId + "cart");
         LinkedHashSet<BuyerItem> newBuyerList = new LinkedHashSet<>();
         // redis中无商品信息
@@ -168,6 +160,10 @@ public class ItemCartController {
                 itemCart.setUpdateDate(simpleDateFormat.format(new Date()));
                 // 先创建redis
                 redisTemplate.opsForValue().set(userId + "cart", itemCart);
+                redisTemplate.delete(itemCartId);
+                //存库
+                ItemCartVo itemCartVoip = new ItemCartVo(itemCart.getItemCartId(), itemCart.getUserId(), 0, JsonUtil.toJson(itemCart.getBuyerItems()));
+                this.itemCartService.addCartService(itemCartVoip);
             }
             return Result.result(ResultEnum.SUCCESS, "success");
             // redis中有商品信息
@@ -186,8 +182,9 @@ public class ItemCartController {
             }
             // 存入redis中
             redisTemplate.opsForValue().set(userId + "cart", itemCartRedis);
-            // 删除cookie
-            CookieUtil.deleteCookie(itemCartId,request,response);
+            // 存库
+            ItemCartVo itemCartVoip = new ItemCartVo(itemCartRedis.getItemCartId(), itemCartRedis.getUserId(), 0, JsonUtil.toJson(itemCartRedis.getBuyerItems()));
+            this.itemCartService.updateCartService(itemCartVoip);
             return Result.result(ResultEnum.SUCCESS, "success");
         }
 
@@ -195,23 +192,20 @@ public class ItemCartController {
 
 
     /**
-     * 未登录情况下，展示购物车信息 cookie
+     * 未登录情况下，展示购物车信息 redis
      *
      * @param itemCartId
-     * @param request
-     * @param response
      * @return
      */
     @RequestMapping("showCartNoLogin")
-    public JSONObject showCartNoLogin(@RequestParam(value = "itemCart", defaultValue = "null") String itemCartId, HttpServletRequest request, HttpServletResponse response) {
+    public JSONObject showCartNoLogin(@RequestParam(value = "itemCart", defaultValue = "null") String itemCartId) {
 
         if (itemCartId.equals("null")) {
             return Result.result(ResultEnum.ERROR, "购物车为空", "error");
         }
-        Cookie itemCartOld = CookieUtil.get(request, itemCartId);
+       String itemCartOld = (String) redisTemplate.opsForValue().get(itemCartId);
         if (itemCartOld != null) {
-            String res = URLDecoder.decode(itemCartOld.getValue());
-            ItemCart itemCart = (ItemCart) JsonUtil.fromJson(res, ItemCart.class);
+            ItemCart itemCart = (ItemCart) JsonUtil.fromJson(itemCartOld, ItemCart.class);
             return Result.result(ResultEnum.SUCCESS, itemCart.getBuyerItems(), "success");
         }
         return Result.nullResult();
