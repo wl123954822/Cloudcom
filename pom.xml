@@ -25,7 +25,7 @@
         <module>service-zuul</module>
         <module>config-server</module>
         <module>admin-server</module>
-        <module>service-useradmin</module>
+       <!-- <module>service-useradmin</module>-->
         <module>service-commodity</module>
         <module>service-spcart</module>
         <module>service-address</module>

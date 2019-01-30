@@ -33,7 +33,7 @@ public class Tes {
         JSONObject jsonObject = new JSONObject();
         User user = (User) redisTemplate.opsForValue().get(token);
         if (user != null) {
-            List<Menu> menu = menuService.getMenusByUserId(user.getId());
+            List<Menu> menu = menuService.getMenusByUserId();
             jsonObject.put("menu",menu);
             jsonObject.put("user",user);
         } else {

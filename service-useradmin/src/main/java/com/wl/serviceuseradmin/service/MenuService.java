@@ -11,7 +11,7 @@ public interface MenuService {
 
      List<Menu> getAllMenu();
 
-     List<Menu> getMenusByUserId(Long userId);
+     List<Menu> getMenusByUserId();
 
      List<Menu> menuTree();
 

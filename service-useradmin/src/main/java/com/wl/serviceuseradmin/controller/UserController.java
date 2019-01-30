@@ -40,21 +40,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RedisTemplate redisTemplate;
-    /**
-     * 用户登录接口
-     */
-    @RequestMapping("/adminlogin")
-    public JSONObject login(@RequestParam("username") String username, @RequestParam("password") String password,HttpServletRequest request,HttpServletResponse response) {
-        User user = userService.loadUserByUsername(username);
-        String passwordStr = user.getPassword();
-        // 获取数据库解密后的密码
-        String dePassword = new String(PasswordUtil.AESDecrypt(PasswordUtil.parseHexStr2Byte(passwordStr), username));
-        if (!dePassword.equals(password)) {
-            return Result.result(ResultEnum.PASSWORD_ERROR, "error");
-        } else {
-            return this.adminLogin(user.getOpenId(),request,response);
-        }
-    }
+
+
 
     @RequestMapping("/register")
     public JSONObject register(String username, String password, String token) {

@@ -1,9 +1,13 @@
+/*
 package com.wl.serviceuseradmin.service.impl;
 
 import com.wl.serviceuseradmin.dao.UserDao;
 import com.wl.serviceuseradmin.entity.User;
 import com.wl.serviceuseradmin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -11,15 +15,15 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private UserDao userDao;
 
     @Override
-    public User loadUserByUsername(String s) {
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userDao.loadUserByUserName(s);
         if (user == null) {
-            throw new RuntimeException("用户名不对");
+            throw new UsernameNotFoundException("用户名不对");
         }
         return user;
     }
@@ -57,3 +61,4 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 }
+*/

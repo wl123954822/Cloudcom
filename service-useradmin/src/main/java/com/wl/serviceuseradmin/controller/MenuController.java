@@ -39,7 +39,7 @@ public class MenuController {
         User user = userService.loadUserByOpenid(openid);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user",user);
-        jsonObject.put("menu", menuService.getMenusByUserId(user.getId()));
+        jsonObject.put("menu", menuService.getMenusByUserId());
         return jsonObject;
     }
 
